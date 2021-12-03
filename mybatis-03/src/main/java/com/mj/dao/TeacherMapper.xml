@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 绑定一个对应的 Dao/Mapper 接口 -->
+<mapper namespace="com.mj.dao.TeacherMapper">
+
+    <!-- 方式一：子查询，按查询嵌套处理-->
+    <select id="getTeacher1" resultMap="resultMapper1">
+        select * from mybatis.teacher where id = #{tid}
+    </select>
+
+    <resultMap id="resultMapper1" type="com.mj.pojo.Teacher">
+        <collection property="students" javaType="ArrayList" ofType="com.mj.pojo.Student" select="getStudentByTeacherId" column="id"/>
+    </resultMap>
+
+    <select id="getStudentByTeacherId" resultType="com.mj.pojo.Student">
+        select * from mybatis.student where tid = #{tid}
+    </select>
+
+
+    <!-- 方式二：按结果嵌套查询-->
+    <select id="getTeacher" resultMap="TeacherStudentMapper">
+        select t.id tid,
+        t.name tname,
+        s.id sid,
+        s.name sname
+        from mybatis.teacher t,
+        mybatis.student s
+        where tid = #{tid}
+    </select>
+
+    <resultMap id="TeacherStudentMapper" type="com.mj.pojo.Teacher">
+        <result property="id" column="tid"/>
+        <result property="name" column="tname"/>
+        <!--
+            对象：association  集合：collection
+            javaType="" 指定对象的属性
+            ofType="" 指定集合中对象的属性
+        -->
+        <collection property="students" ofType="com.mj.pojo.Student">
+            <result property="id" column="sid"/>
+            <result property="name" column="sname"/>
+        </collection>
+    </resultMap>
+
+
+</mapper>

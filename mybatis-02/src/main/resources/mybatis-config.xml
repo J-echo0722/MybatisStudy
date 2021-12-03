@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!-- 用 properties 数据源配置 -->
+    <properties resource="db.properties"/>
+
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 标准日志工厂日志实现 -->
+        <!--<setting name="logImpl" value="STDOUT_LOGGING"/>-->
+        <setting name="logImpl" value="LOG4J"/>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="lazyLoadingEnabled" value="true"/>
+    </settings>
+
+    <!-- 给实体类起别名 -->
+    <typeAliases>
+        <!-- 方式1：给指定类起别名 -->
+        <typeAlias type="com.mj.pojo.User" alias="User"/>
+
+        <!--
+        &lt;!&ndash; 方式2：给包起别名，每一个改包下的实体类，没有注解时，类名即为该类的别名 &ndash;&gt;
+        <package name="com.mj.pojo"/>
+        -->
+    </typeAliases>
+
+
+    <!-- 多数据源配置，dev 环境的参数从 db.properties 取，test 环境的参数直接写 -->
+    <environments default="dev">
+        <!-- dev 环境 -->
+        <environment id="dev">
+            <!-- 1. 事务管理器 -->
+            <transactionManager type="JDBC"/>
+            <!-- 2. 数据源 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+
+        <!-- test 环境 -->
+        <environment id="test">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF8&amp;serverTimezone=GMT%2B8"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+
+    </environments>
+
+
+    <!-- 几种 mapper 注册方式 -->
+    <mappers>
+
+        <!-- 方式1. resource 必须： 每一个 Mapper.XML 都需要在 Mybatis 核心配置文件中注册-->
+        <mapper resource="com/mj/dao/UserMapper.xml"/>
+
+        <!--
+        &lt;!&ndash; 方式2. class 文件注册 必须：1. 接口和 mapper 配置文件同名，2.接口和 mapper 配置文件同在一个包&ndash;&gt;
+        <mapper class="com.mj.dao.UserMapper"/>
+        -->
+
+        <!--
+        &lt;!&ndash; 方式3. package 扫描包注入绑定，必须：1. 接口和 mapper 配置文件同名，2.接口和 mapper 配置文件同在一个包 &ndash;&gt;
+        <package name="com.mj.dao"/>
+        -->
+    </mappers>
+
+
+</configuration>

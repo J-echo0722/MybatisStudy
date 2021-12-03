@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 绑定一个对应的 Dao/Mapper 接口 -->
+<mapper namespace="com.mj.dao.BlogMapper">
+
+    <!--<cache/>-->
+    <!-- 在当前 Mapper.xml 中使用二级缓存 -->
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+
+    <!-- 实体类和表字段映射 -->
+    <resultMap id="BaseResultMap" type="com.mj.pojo.Blog">
+        <result column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="author" property="author"/>
+        <result column="views" property="views"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select *
+        from mybatis.blog
+        where id = #{id}
+    </select>
+
+    <select id="selectBlogListByPage" resultMap="BaseResultMap">
+        select *
+        from mybatis.blog
+        <where>
+            <if test="model.id != null">
+                id = #{model.id}
+            </if>
+            <if test="model.title != null and model.title != ''">
+                and title = #{model.title}
+            </if>
+            <if test="model.author != null and model.author != ''">
+                and author = #{model.author}
+            </if>
+            <if test="model.views != null">
+                and views = #{model.views}
+            </if>
+            <if test="model.createTime != null">
+                and create_time = #{model.createTime}
+            </if>
+            <if test="model.updateTime != null">
+                and update_time = #{model.updateTime}
+            </if>
+        </where>
+        <if test="page != null">
+            <if test="page.orderClause != null and page.orderClause != ''">
+                order by #{page.orderClause}
+            </if>
+            limit #{page.start}, #{page.pageSize}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.mj.pojo.Blog">
+        insert into mybatis.blog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="model.title != null and model.title != ''">
+                title,
+            </if>
+            <if test="model.author != null and model.author != ''">
+                author,
+            </if>
+            <if test="model.views != null">
+                views,
+            </if>
+            create_time,
+            update_time
+        </trim>
+        value
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="model.title != null and model.title != ''">
+                #{model.title},
+            </if>
+            <if test="model.author != null and model.author != ''">
+                #{model.author},
+            </if>
+            <if test="model.views != null">
+                #{model.views},
+            </if>
+            now(),
+            now()
+        </trim>
+    </insert>
+
+    <update id="update">
+        update mybatis.blog
+        set
+        <if test="model.author != null and model.author != ''">
+            author = #{model.author},
+        </if>
+        <if test="model.title != null and model.title != ''">
+            title = #{model.title},
+        </if>
+        <if test="model.views != null">
+            views = #{model.views},
+        </if>
+        update_time = now()
+        where id = #{model.id}
+    </update>
+
+
+</mapper>
